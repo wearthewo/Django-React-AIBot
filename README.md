@@ -1,1 +1,1 @@
-"# Django-React-AIBot" 
+A full stack django react app with user authentication using jwt and cookies and hugging api for making requests for our chatbot. In the backend we use django serializers for the serialization and deserialization fo the data. In frontend we use React with Tailwind.
