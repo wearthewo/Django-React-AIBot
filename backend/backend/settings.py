@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -56,32 +57,19 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware", 
-    "corsheaders.middleware.CorsMiddleware", 
+    
     
     
 ] 
 
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-} 
+"" 
 
-SIMPLE_JWT = {  
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60), 
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
-    "AUTH_COOKIE": "access",
-    "AUTH_COOKIE_REFRESH": "refresh",
-    "AUTH_COOKIE_SECURE": False,  # Set True in production
-    "AUTH_COOKIE_HTTP_ONLY": True,
-    "AUTH_COOKIE_PATH": "/",
-    "AUTH_COOKIE_SAMESITE": "None",
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'aibot.authentication.CookieJWTAuthentication',  # Custom authentication for cookies
+    ), 
+    
 }
 
 ROOT_URLCONF = "backend.urls"
@@ -160,34 +148,40 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 ] 
 
-SESSION_COOKIE_SECURE = False  # ✅ Set True if using HTTPS
-CSRF_COOKIE_SECURE = False  # ✅ Set True if using HTTPS
+# JWT settings
+#from rest_framework_simplejwt.authentication import JWTAuthentication
+
+""" SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken') 
+
+} """
+
+# ---------------------------
+# Cookies settings for dev
+# ---------------------------
+SESSION_COOKIE_SECURE = False  #  In dev, keep it False
+CSRF_COOKIE_SECURE = False     #  In dev, keep it False
+
+CSRF_COOKIE_SAMESITE = "None"  # Needed for cross-origin cookies
+SESSION_COOKIE_SAMESITE = "None"  
 
 
-CSRF_COOKIE_NAME = "csrftoken"  # This will ensure that CSRF token is sent in cookies
-CSRF_COOKIE_HTTPONLY = False  # Make sure CSRF token is accessible from JavaScript
-CSRF_COOKIE_SECURE = False  # Set this to True if you are using HTTPS in production
-CSRF_COOKIE_SAMESITE = "None"  # This will allow CSRF token to be sent with cross-origin POST requests 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    'BLACKLIST_AFTER_ROTATION': True,
 
-
- 
-
-SESSION_COOKIE_NAME = "sessionid"  # This is the default name for the session cookie
-SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Using the database backend
-SESSION_COOKIE_SAMESITE = "None"  # This will allow the session cookie to be sent with cross-origin requests
-
-# Allow cookies to be included in cross-origin requests
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'cookie',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
-# Allow credentials to be included in cross-origin requests
-CORS_ALLOW_CREDENTIALS = True
+    # custom
+    "AUTH_COOKIE": "access",  # cookie name
+    "AUTH_COOKIE_DOMAIN": None,  # specifies domain for which the cookie will be sent
+    "AUTH_COOKIE_SECURE": False,  # restricts the transmission of the cookie to only occur over secure (HTTPS) connections. 
+    "AUTH_COOKIE_HTTP_ONLY": True,  # prevents client-side js from accessing the cookie
+    "AUTH_COOKIE_PATH": "/",  # URL path where cookie will be sent
+    "AUTH_COOKIE_SAMESITE": "Lax",  # specifies whether the cookie should be sent in cross site requests
+}

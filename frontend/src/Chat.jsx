@@ -51,7 +51,7 @@ function Chat() {
 
   const handleLogout = async () => {
     try {
-      //await api.post("logout/"); // ✅ Logout request
+      await api.post("logout/"); // ✅ Logout request
       alert("Logged out successfully");
       navigate("/login"); // ✅ Redirect to login
     } catch (error) {
